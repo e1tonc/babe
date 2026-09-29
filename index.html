@@ -1,68 +1,60 @@
-```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我爱你 王依晴 🌊 义勇的专属守护</title>
-    <!-- STREAMING_CHUNK: Loading Tailwind CSS, FontAwesome and Cute Google Fonts -->
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
-    <script src="[https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js](https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js)"></script>
+    <title>王依晴 🎮 8-BIT TIMER</title>
+    <!-- 8-Bit Pixel Fonts & Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        @import url('[https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Noto+Sans+SC:wght@500;700;900&display=swap](https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Noto+Sans+SC:wght@500;700;900&display=swap)');
-
-        /* STREAMING_CHUNK: Configuring custom color palette, Giyu Haori accents, and animations */
-        :root {
-            --giyu-red: #8b1528;
-            --giyu-yellow: #facc15;
-            --giyu-green: #15803d;
-            --water-cyan: #00f5d4;
-            --water-blue: #3b82f6;
-            --deep-ocean: #0b132b;
-            --pastel-pink: #ff85a1;
-        }
-
+        /* 8-Bit Pixel Styling */
         body {
-            font-family: 'M PLUS Rounded 1c', 'Noto Sans SC', sans-serif;
-            background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #0f172a 100%);
+            font-family: 'DotGothic16', monospace;
+            background-color: #080c1a;
             color: #ffffff;
-            min-h: 100vh;
-            overflow-x: hidden;
+            image-rendering: pixelated;
             user-select: none;
+            overflow-x: hidden;
         }
 
-        /* Giyu Split Haori Ribbon Border */
-        .giyu-haori-bar {
-            height: 10px;
+        .pixel-font-en {
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        /* 8-Bit Retro Box Borders */
+        .pixel-box {
+            background: #0d162f;
+            border: 4px solid #ffffff;
+            box-shadow: 6px 6px 0px #00f5d4, -4px -4px 0px #000000 inset;
+            position: relative;
+        }
+
+        .pixel-box-pink {
+            background: #1a0d24;
+            border: 4px solid #ff85a1;
+            box-shadow: 6px 6px 0px #ff0055;
+        }
+
+        /* 8-Bit Giyu Haori Pattern Top Strip */
+        .giyu-pixel-bar {
+            height: 12px;
             width: 100%;
-            background: linear-gradient(90deg, 
-                var(--giyu-red) 0%, var(--giyu-red) 50%, 
-                #eab308 50%, #15803d 75%, #eab308 100%);
-            background-size: 40px 100%;
-            box-shadow: 0 0 15px rgba(0, 245, 212, 0.4);
+            background-image: repeating-linear-gradient(
+                90deg,
+                #8b0000 0px, #8b0000 16px,
+                #facc15 16px, #facc15 32px,
+                #15803d 32px, #15803d 48px,
+                #000000 48px, #000000 52px
+            );
+            border-bottom: 3px solid #000;
         }
 
-        /* Cute Animated Glowing Text */
-        .title-glow {
-            text-shadow: 0 0 15px rgba(255, 133, 161, 0.8), 0 0 30px rgba(0, 245, 212, 0.5);
-            background: linear-gradient(135deg, #ffffff 0%, #ffc2d1 50%, #00f5d4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Cute Glassmorphism Card Style */
-        .cute-glass-card {
-            background: rgba(28, 37, 65, 0.65);
-            backdrop-filter: blur(16px);
-            border: 2px solid rgba(0, 245, 212, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 15px rgba(0, 245, 212, 0.1);
-            border-radius: 2rem;
-        }
-
-        /* Water Bubble Particle Canvas */
-        #waterCanvas {
+        /* Canvas background for retro pixel particles */
+        #pixelCanvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -72,150 +64,122 @@
             z-index: 1;
         }
 
-        /* Floating Animation */
-        @keyframes gentleFloat {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(2deg); }
+        /* Retro Ticking Pulse for Seconds */
+        @keyframes pixelTick {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); color: #ff0055; }
+            100% { transform: scale(1); }
         }
 
-        .animate-float {
-            animation: gentleFloat 4s ease-in-out infinite;
+        .tick-second {
+            animation: pixelTick 1s steps(1) infinite;
         }
 
-        /* Cute Pulse for Seconds */
-        @keyframes heartPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+        /* Pixel Button Press Effect */
+        .pixel-btn {
+            background: #00f5d4;
+            color: #000000;
+            border: 3px solid #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+            font-weight: bold;
         }
-
-        .pulse-sec {
-            animation: heartPulse 1s ease-in-out infinite;
+        .pixel-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0px #000000;
         }
     </style>
 </head>
-<body class="flex flex-col justify-between min-h-screen relative" onclick="spawnClickBubble(event)">
+<body class="min-h-screen flex flex-col justify-between relative" onclick="playBeep()">
 
-    <!-- STREAMING_CHUNK: Canvas background for water bubbles and pink hearts -->
-    <canvas id="waterCanvas"></canvas>
+    <canvas id="pixelCanvas"></canvas>
 
-    <!-- Top Giyu Split Haori Decorative Bar -->
-    <div class="giyu-haori-bar sticky top-0 z-50"></div>
+    <!-- Top 8-Bit Giyu Haori Ribbon -->
+    <div class="giyu-pixel-bar sticky top-0 z-50"></div>
 
-    <!-- Main Container -->
-    <main class="relative z-10 max-w-3xl mx-auto px-4 py-8 sm:py-12 flex-grow flex flex-col items-center justify-center text-center space-y-8">
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-2xl mx-auto px-4 py-8 flex-grow flex flex-col items-center justify-center text-center space-y-8">
 
-        <!-- STREAMING_CHUNK: Cute Anime Badge & Character Motif -->
-        <div class="animate-float space-y-3">
-            <!-- Cute Badge -->
-            <div class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600/40 via-cyan-500/30 to-teal-500/40 border border-cyan-400/60 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold text-cyan-200 shadow-lg backdrop-blur-md">
-                <span class="text-base">🌊</span>
-                <span>水之呼吸 · 壹之型：永远爱依晴</span>
-                <span class="text-pink-400">💖</span>
-            </div>
-
-            <!-- Giyu Haori Icon & Cute Header -->
-            <div class="flex justify-center items-center gap-3 pt-2">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-800 to-yellow-600 p-0.5 shadow-md flex items-center justify-center">
-                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-cyan-300 font-extrabold text-sm">
-                        义勇
-                    </div>
-                </div>
-                <span class="text-xs font-bold text-slate-300 tracking-wider">富冈义勇的专属守护信物</span>
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-green-700 to-cyan-500 p-0.5 shadow-md flex items-center justify-center">
-                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-pink-300 font-extrabold text-sm">
-                        依晴
-                    </div>
-                </div>
-            </div>
+        <!-- Header Badge -->
+        <div class="pixel-box p-3 inline-flex items-center gap-3">
+            <span class="text-xl">🌊</span>
+            <span class="text-xs sm:text-sm text-cyan-300 font-bold tracking-widest">
+                PLAYER 1: 王依晴
+            </span>
+            <span class="text-xl">💖</span>
         </div>
 
-        <!-- STREAMING_CHUNK: Main Title - "我爱你 王依晴" -->
+        <!-- Main Title -->
         <div class="space-y-2">
-            <h1 class="text-5xl sm:text-7xl font-black title-glow tracking-tight leading-tight py-2">
-                我爱你 王依晴
+            <h1 class="text-4xl sm:text-6xl font-black text-yellow-300 tracking-wider">
+                王依晴
             </h1>
-            <p class="text-sm sm:text-base text-cyan-200/80 font-medium max-w-md mx-auto">
-                “即使水面波涛汹涌，我对你的心意也如深海般坚定不移。”
+            <p class="text-base sm:text-lg text-cyan-300 font-bold">
+                [ 2024.06.22 - FOREVER ]
             </p>
         </div>
 
-        <!-- STREAMING_CHUNK: Core Love Timer Display -->
-        <section class="cute-glass-card p-6 sm:p-8 w-full max-w-2xl relative overflow-hidden space-y-6">
-            <!-- Background Cute Glow -->
-            <div class="absolute -top-12 -right-12 w-32 h-32 bg-cyan-400/20 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-pink-500/20 rounded-full blur-2xl pointer-events-none"></div>
-
-            <div class="flex items-center justify-center gap-2 text-xs sm:text-sm font-bold text-cyan-300 tracking-widest uppercase">
-                <i class="fas fa-heart text-pink-400 animate-pulse"></i>
-                <span>我们在一起已经</span>
-                <i class="fas fa-heart text-pink-400 animate-pulse"></i>
+        <!-- Core 8-Bit Timer Display -->
+        <section class="pixel-box p-6 sm:p-8 w-full space-y-6">
+            <div class="text-xs sm:text-sm text-pink-400 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                <span>▲</span>
+                <span>在一起的时间计数</span>
+                <span>▲</span>
             </div>
 
-            <!-- Timer Grid Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <!-- Big Number Timer Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                 <!-- Days -->
-                <div class="bg-slate-900/80 border border-cyan-500/30 p-4 rounded-2xl flex flex-col items-center justify-center shadow-inner">
-                    <span id="days" class="text-4xl sm:text-5xl font-black text-cyan-300 font-mono tracking-tight">000</span>
-                    <span class="text-xs text-slate-400 font-bold mt-1">天 (Days)</span>
+                <div class="bg-black/60 border-2 border-cyan-400 p-3">
+                    <div id="days" class="text-3xl sm:text-4xl font-bold text-cyan-300 pixel-font-en">000</div>
+                    <div class="text-xs text-slate-400 mt-1">DAYS</div>
                 </div>
                 <!-- Hours -->
-                <div class="bg-slate-900/80 border border-cyan-500/30 p-4 rounded-2xl flex flex-col items-center justify-center shadow-inner">
-                    <span id="hours" class="text-4xl sm:text-5xl font-black text-cyan-300 font-mono tracking-tight">00</span>
-                    <span class="text-xs text-slate-400 font-bold mt-1">小时 (Hours)</span>
+                <div class="bg-black/60 border-2 border-cyan-400 p-3">
+                    <div id="hours" class="text-3xl sm:text-4xl font-bold text-cyan-300 pixel-font-en">00</div>
+                    <div class="text-xs text-slate-400 mt-1">HOURS</div>
                 </div>
                 <!-- Minutes -->
-                <div class="bg-slate-900/80 border border-cyan-500/30 p-4 rounded-2xl flex flex-col items-center justify-center shadow-inner">
-                    <span id="minutes" class="text-4xl sm:text-5xl font-black text-cyan-300 font-mono tracking-tight">00</span>
-                    <span class="text-xs text-slate-400 font-bold mt-1">分钟 (Mins)</span>
+                <div class="bg-black/60 border-2 border-cyan-400 p-3">
+                    <div id="minutes" class="text-3xl sm:text-4xl font-bold text-cyan-300 pixel-font-en">00</div>
+                    <div class="text-xs text-slate-400 mt-1">MINS</div>
                 </div>
                 <!-- Seconds -->
-                <div class="bg-slate-900/80 border border-pink-500/40 p-4 rounded-2xl flex flex-col items-center justify-center shadow-inner pulse-sec">
-                    <span id="seconds" class="text-4xl sm:text-5xl font-black text-pink-400 font-mono tracking-tight">00</span>
-                    <span class="text-xs text-pink-300/80 font-bold mt-1">秒 (Secs)</span>
+                <div class="bg-black/60 border-2 border-pink-500 p-3">
+                    <div id="seconds" class="text-3xl sm:text-4xl font-bold text-pink-400 pixel-font-en tick-second">00</div>
+                    <div class="text-xs text-pink-400 mt-1">SECS</div>
                 </div>
             </div>
 
-            <!-- Start Date Label -->
-            <div class="pt-2 border-t border-cyan-500/20 text-xs text-cyan-200/60 font-mono flex items-center justify-center gap-1">
-                <i class="far fa-clock"></i>
-                <span>始于 2024年6月22日 凌晨01:44</span>
+            <!-- Exact Timestamp -->
+            <div class="text-xs text-slate-400 font-mono pt-2 border-t border-slate-700">
+                计时起点：2024年06月22日 凌晨 01:44
             </div>
         </section>
 
-        <!-- STREAMING_CHUNK: Chibi Giyu Anime Quote Box -->
-        <section class="cute-glass-card p-5 w-full max-w-xl text-left flex items-center gap-4 relative">
-            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex-shrink-0 flex items-center justify-center text-2xl shadow-lg border-2 border-cyan-200">
-                🌊
-            </div>
-            <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                    <span class="font-extrabold text-sm text-cyan-300">富冈义勇</span>
-                    <span class="text-[10px] bg-red-900/80 text-yellow-300 font-bold px-2 py-0.5 rounded-full border border-yellow-500/40">水柱限定</span>
+        <!-- 8-Bit Pixel Giyu Badge -->
+        <section class="pixel-box-pink p-4 w-full flex items-center justify-between text-left">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl">⚔️</div>
+                <div>
+                    <div class="text-xs text-pink-300 font-bold">水柱 · 富冈义勇</div>
+                    <div class="text-sm font-bold text-yellow-300 mt-0.5">专属守护玩家：王依晴</div>
                 </div>
-                <p class="text-xs sm:text-sm font-bold text-slate-200 leading-relaxed">
-                    “我才没有被讨厌呢……因为我有依晴在呀！”
-                </p>
             </div>
+            <button onclick="pressHeartButton()" class="pixel-btn text-xs px-3 py-2 cursor-pointer">
+                ❤️ PRESS
+            </button>
         </section>
-
-        <!-- Interactive Button for Love Hearts Burst -->
-        <button onclick="triggerLoveBurst()" class="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:to-cyan-600 text-white font-black text-sm px-6 py-3 rounded-2xl shadow-lg shadow-cyan-500/20 border border-white/20 transform active:scale-95 transition-all flex items-center gap-2">
-            <i class="fas fa-magic"></i>
-            <span>给依晴送个水之呼吸爱心！</span>
-        </button>
 
     </main>
 
-    <!-- Bottom Decorative Haori Bar & Simple Footer -->
-    <footer class="relative z-10 py-6 text-center text-xs text-slate-400 space-y-2">
-        <p>为 王依晴 专属定制 · 永远爱你的男朋友 💙</p>
-        <div class="giyu-haori-bar mt-4"></div>
+    <!-- Bottom Ribbon & Simple Footer -->
+    <footer class="relative z-10 py-4 text-center text-xs text-slate-500 space-y-2">
+        <p>GAME OVER? NEVER. 👾</p>
+        <div class="giyu-pixel-bar"></div>
     </footer>
 
     <script>
-        /* STREAMING_CHUNK: Precise Love Timer Logic & Canvas Bubble/Heart Animation */
-        
-        // Exact Love Start Time: June 22, 2024 at 01:44:00 AM
+        // Exact Start Date: June 22, 2024 at 1:44 AM
         const startDate = new Date('2024-06-22T01:44:00');
 
         function updateTimer() {
@@ -238,37 +202,35 @@
         setInterval(updateTimer, 1000);
         updateTimer();
 
-        // Confetti Heart Burst
-        function triggerLoveBurst() {
-            confetti({
-                particleCount: 50,
-                spread: 70,
-                origin: { y: 0.7 },
-                colors: ['#00f5d4', '#ff85a1', '#3b82f6', '#facc15']
-            });
-            playSoftWaterTone();
-        }
-
-        // Web Audio Synthesizer (Cute Water Drop Sound)
-        function playSoftWaterTone() {
+        // 8-Bit Retro Chiptune Beep
+        function playBeep(freq = 440) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+                osc.type = 'square'; // 8-bit square wave
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.1);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 osc.start();
-                osc.stop(ctx.currentTime + 0.15);
+                osc.stop(ctx.currentTime + 0.1);
             } catch(e){}
         }
 
-        // Canvas Water Bubbles & Floating Hearts System
-        const canvas = document.getElementById('waterCanvas');
+        function pressHeartButton() {
+            playBeep(880);
+            confetti({
+                particleCount: 40,
+                spread: 60,
+                origin: { y: 0.8 },
+                colors: ['#00f5d4', '#ff85a1', '#facc15']
+            });
+        }
+
+        // 8-Bit Pixel Particle Canvas
+        const canvas = document.getElementById('pixelCanvas');
         const ctx = canvas.getContext('2d');
 
         function resizeCanvas() {
@@ -278,77 +240,41 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        const particles = [];
-        const particleCount = 25;
+        const pixels = [];
+        const count = 30;
 
-        class Particle {
+        class PixelParticle {
             constructor() {
                 this.reset();
             }
             reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = canvas.height + Math.random() * 100;
-                this.radius = Math.random() * 6 + 3;
+                this.x = Math.floor(Math.random() * canvas.width);
+                this.y = canvas.height + Math.random() * 50;
+                this.size = Math.floor(Math.random() * 4 + 4); // Pixel squares
                 this.speedY = Math.random() * 1 + 0.5;
-                this.speedX = Math.random() * 0.6 - 0.3;
-                this.opacity = Math.random() * 0.5 + 0.3;
-                this.isHeart = Math.random() > 0.6; // 40% hearts, 60% water bubbles
+                this.color = ['#00f5d4', '#ff85a1', '#facc15', '#3b82f6'][Math.floor(Math.random() * 4)];
             }
             update() {
                 this.y -= this.speedY;
-                this.x += Math.sin(this.y * 0.02) + this.speedX;
-
-                if (this.y < -20) {
-                    this.reset();
-                }
+                if (this.y < -10) this.reset();
             }
             draw() {
-                ctx.save();
-                ctx.globalAlpha = this.opacity;
-                if (this.isHeart) {
-                    ctx.fillStyle = '#ff85a1';
-                    ctx.font = `${this.radius * 2.5}px sans-serif`;
-                    ctx.fillText('💖', this.x, this.y);
-                } else {
-                    // Water Bubble
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(0, 245, 212, 0.3)';
-                    ctx.strokeStyle = 'rgba(0, 245, 212, 0.8)';
-                    ctx.lineWidth = 1.5;
-                    ctx.fill();
-                    ctx.stroke();
-                }
-                ctx.restore();
+                ctx.fillStyle = this.color;
+                ctx.fillRect(Math.floor(this.x), Math.floor(this.y), this.size, this.size);
             }
         }
 
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
+        for (let i = 0; i < count; i++) pixels.push(new PixelParticle());
 
-        function animateCanvas() {
+        function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
+            pixels.forEach(p => {
                 p.update();
                 p.draw();
             });
-            requestAnimationFrame(animateCanvas);
+            requestAnimationFrame(animate);
         }
-        animateCanvas();
-
-        // Spawn Bubble on Click
-        function spawnClickBubble(e) {
-            playSoftWaterTone();
-            for (let i = 0; i < 4; i++) {
-                const p = new Particle();
-                p.x = e.clientX + (Math.random() * 20 - 10);
-                p.y = e.clientY + (Math.random() * 20 - 10);
-                p.speedY = Math.random() * 2 + 1;
-                particles.push(p);
-                if (particles.length > 50) particles.shift();
-            }
-        }
+        animate();
     </script>
 </body>
 </html>
