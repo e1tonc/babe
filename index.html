@@ -1,280 +1,324 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>王依晴 🎮 8-BIT TIMER</title>
-    <!-- 8-Bit Pixel Fonts & Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>王依晴 8-BIT</title>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+SC:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#050818; --sea:#0b1a3a; --cyan:#00f5d4; --pink:#ff85a1; --hot:#ff0055; --gold:#facc15;
+  --panel:#0d162f; --ink:#ffffff; --mute:#8aa0c8;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%}
+body{
+  margin:0;min-height:100%;color:var(--ink);overflow-x:hidden;user-select:none;-webkit-user-select:none;
+  font-family:'DotGothic16','Noto Sans SC',monospace;
+  background:linear-gradient(var(--night),var(--sea) 60%,#0d2a4a);background-attachment:fixed;
+  padding-top:env(safe-area-inset-top,0px);
+}
+canvas.layer{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none}
+#bg{z-index:0}
+#front{z-index:4}
+.en{font-family:'Press Start 2P',monospace}
 
-    <style>
-        /* 8-Bit Pixel Styling */
-        body {
-            font-family: 'DotGothic16', monospace;
-            background-color: #080c1a;
-            color: #ffffff;
-            image-rendering: pixelated;
-            user-select: none;
-            overflow-x: hidden;
-        }
+/* Top ribbon: left half plain, right half patterned (haori style) */
+.ribbon{position:fixed;top:0;left:0;right:0;height:12px;z-index:6;display:flex;border-bottom:3px solid #000}
+.ribbon i{flex:1;background:#17382b}
+.ribbon b{flex:1;background:repeating-linear-gradient(90deg,#d8402c 0 12px,#facc15 12px 24px,#2ec4b6 24px 36px,#f6efdc 36px 48px)}
 
-        .pixel-font-en {
-            font-family: 'Press Start 2P', monospace;
-        }
+.vert{position:fixed;left:clamp(10px,3vw,40px);top:80px;z-index:2;writing-mode:vertical-rl;
+  color:var(--pink);font-size:clamp(14px,2vw,20px);letter-spacing:.4em;text-shadow:2px 2px 0 #000}
 
-        /* 8-Bit Retro Box Borders */
-        .pixel-box {
-            background: #0d162f;
-            border: 4px solid #ffffff;
-            box-shadow: 6px 6px 0px #00f5d4, -4px -4px 0px #000000 inset;
-            position: relative;
-        }
+main{position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:26px;padding:44px 22px 210px;text-align:center}
 
-        .pixel-box-pink {
-            background: #1a0d24;
-            border: 4px solid #ff85a1;
-            box-shadow: 6px 6px 0px #ff0055;
-        }
+/* pixel frame: stepped corners made of box-shadows */
+.px{background:var(--panel);margin:4px;
+  box-shadow:0 -4px 0 0 #fff,0 4px 0 0 #fff,-4px 0 0 0 #fff,4px 0 0 0 #fff,8px 8px 0 0 #00f5d466}
 
-        /* 8-Bit Giyu Haori Pattern Top Strip */
-        .giyu-pixel-bar {
-            height: 12px;
-            width: 100%;
-            background-image: repeating-linear-gradient(
-                90deg,
-                #8b0000 0px, #8b0000 16px,
-                #facc15 16px, #facc15 32px,
-                #15803d 32px, #15803d 48px,
-                #000000 48px, #000000 52px
-            );
-            border-bottom: 3px solid #000;
-        }
+.badge{padding:10px 16px;font-size:13px;color:var(--cyan);display:inline-flex;gap:10px;align-items:center}
+.name{margin:0;font-size:clamp(52px,15vw,104px);font-weight:400;color:var(--gold);letter-spacing:.06em;
+  text-shadow:4px 4px 0 var(--hot),8px 8px 0 #000;line-height:1.1}
+.since{margin:0;color:var(--cyan);font-size:clamp(12px,2.6vw,16px);letter-spacing:.14em}
 
-        /* Canvas background for retro pixel particles */
-        #pixelCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
+.timer{width:min(640px,100%);padding:22px clamp(12px,3vw,26px) 20px}
+.hd{font-size:13px;color:var(--pink);letter-spacing:.2em;margin-bottom:14px}
+.big{font-size:clamp(15px,3.6vw,22px);line-height:2;margin:0 0 16px}
+.big .en{font-size:clamp(24px,6.4vw,40px);color:var(--cyan);margin:0 6px;text-shadow:3px 3px 0 #000}
+.clock{display:flex;justify-content:center;align-items:center;gap:clamp(4px,1.6vw,12px)}
+.cell{background:#000a;border:3px solid var(--cyan);padding:12px clamp(6px,2vw,14px) 8px;min-width:clamp(64px,19vw,116px)}
+.cell:last-of-type{border-color:var(--pink)}
+.num{display:block;font-size:clamp(22px,6.6vw,42px);color:var(--cyan)}
+.cell:last-of-type .num{color:var(--pink)}
+.lab{display:block;margin-top:10px;font-size:12px;color:var(--mute)}
+.sep{font-size:clamp(18px,5vw,30px);color:var(--gold);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.total{margin:16px 0 0;padding-top:12px;border-top:3px dashed #ffffff33;color:var(--mute);font-size:14px}
+.total b{color:var(--gold);font-weight:400}
 
-        /* Retro Ticking Pulse for Seconds */
-        @keyframes pixelTick {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); color: #ff0055; }
-            100% { transform: scale(1); }
-        }
+.go{font:inherit;font-size:16px;letter-spacing:.14em;color:#000;background:var(--cyan);border:0;cursor:pointer;
+  padding:14px 22px;margin:4px;box-shadow:0 -4px 0 0 #fff,0 4px 0 0 #fff,-4px 0 0 0 #fff,4px 0 0 0 #fff,8px 8px 0 0 #000}
+.go:hover{background:var(--gold)}
+.go:active{transform:translate(4px,4px);box-shadow:0 -4px 0 0 #fff,0 4px 0 0 #fff,-4px 0 0 0 #fff,4px 0 0 0 #fff}
+.go:focus-visible{outline:4px solid var(--pink);outline-offset:6px}
 
-        .tick-second {
-            animation: pixelTick 1s steps(1) infinite;
-        }
+/* Walking sprite */
+.walker{position:fixed;left:0;bottom:20px;z-index:3;width:120px;height:120px;will-change:transform}
+.hop{width:100%;height:100%}
+.hop.jump{animation:jump .5s steps(8)}
+@keyframes jump{50%{transform:translateY(-64px)}}
+.flip{position:relative;width:100%;height:100%}
+.bob{position:relative;width:100%;height:100%;animation:bob .6s steps(1) infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.bob canvas{position:absolute;image-rendering:pixelated}
+#body{left:0;top:0;width:96px;height:120px}
+#sword{left:90px;top:0;width:24px;height:90px;transform-origin:50% 88%;animation:gleam 2.4s steps(1) infinite}
+#sword.swing{animation:swing .45s steps(5)}
+@keyframes gleam{0%,86%{filter:none}90%{filter:brightness(2.2)}96%{filter:none}}
+@keyframes swing{0%{transform:rotate(0)}45%{transform:rotate(110deg)}100%{transform:rotate(0)}}
+.custom{position:absolute;left:0;top:0;height:120px;image-rendering:pixelated}
+.bubble{position:absolute;left:50%;top:-44px;transform:translateX(-50%);white-space:nowrap;display:none;
+  background:#fff;color:#000;padding:6px 10px;font-size:14px;box-shadow:4px 4px 0 #000}
+.bubble.on{display:block}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-4px;border:4px solid transparent;border-top-color:#fff;border-width:8px 6px 0}
 
-        /* Pixel Button Press Effect */
-        .pixel-btn {
-            background: #00f5d4;
-            color: #000000;
-            border: 3px solid #ffffff;
-            box-shadow: 4px 4px 0px #000000;
-            font-weight: bold;
-        }
-        .pixel-btn:active {
-            transform: translate(3px, 3px);
-            box-shadow: 1px 1px 0px #000000;
-        }
-    </style>
+@media (max-width:560px){.vert{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
 </head>
-<body class="min-h-screen flex flex-col justify-between relative" onclick="playBeep()">
+<body>
+<canvas class="layer" id="bg"></canvas>
+<div class="ribbon" aria-hidden="true"><i></i><b></b></div>
+<div class="vert">火星人的来时路~</div>
 
-    <canvas id="pixelCanvas"></canvas>
+<main>
+  <div class="px badge en"><span>🌊</span><span>PLAYER 1</span><span>💖</span></div>
 
-    <!-- Top 8-Bit Giyu Haori Ribbon -->
-    <div class="giyu-pixel-bar sticky top-0 z-50"></div>
+  <div>
+    <h1 class="name">王依晴</h1>
+    <p class="since">[ 2026.06.22 01:44 - FOREVER ]</p>
+  </div>
 
-    <!-- Main Content -->
-    <main class="relative z-10 max-w-2xl mx-auto px-4 py-8 flex-grow flex flex-col items-center justify-center text-center space-y-8">
+  <section class="px timer">
+    <div class="hd">▲ 在一起的时间计数 ▲</div>
+    <p class="big">已经 <span class="en" id="mo">0</span>个月 <span class="en" id="dy">0</span>天</p>
+    <div class="clock" role="timer" aria-live="off">
+      <div class="cell"><span class="num en" id="hh">00</span><span class="lab">HOURS</span></div>
+      <span class="sep en">:</span>
+      <div class="cell"><span class="num en" id="mm">00</span><span class="lab">MINS</span></div>
+      <span class="sep en">:</span>
+      <div class="cell"><span class="num en" id="ss">00</span><span class="lab">SECS</span></div>
+    </div>
+    <p class="total">TOTAL <b id="td">0</b> 天 / <b id="th">0</b> 小时</p>
+  </section>
 
-        <!-- Header Badge -->
-        <div class="pixel-box p-3 inline-flex items-center gap-3">
-            <span class="text-xl">🌊</span>
-            <span class="text-xs sm:text-sm text-cyan-300 font-bold tracking-widest">
-                PLAYER 1: 王依晴
-            </span>
-            <span class="text-xl">💖</span>
-        </div>
+  <button class="go" id="btn">火星人的来时路~</button>
+</main>
 
-        <!-- Main Title -->
-        <div class="space-y-2">
-            <h1 class="text-4xl sm:text-6xl font-black text-yellow-300 tracking-wider">
-                王依晴
-            </h1>
-            <p class="text-base sm:text-lg text-cyan-300 font-bold">
-                [ 2024.06.22 - FOREVER ]
-            </p>
-        </div>
+<div class="walker" id="walker">
+  <div class="bubble" id="bubble">火星人的来时路~</div>
+  <div class="hop" id="hop"><div class="flip" id="flip"><div class="bob" id="bob">
+    <canvas id="body" width="16" height="20"></canvas>
+    <canvas id="sword" width="4" height="15"></canvas>
+  </div></div></div>
+</div>
+<canvas class="layer" id="front"></canvas>
 
-        <!-- Core 8-Bit Timer Display -->
-        <section class="pixel-box p-6 sm:p-8 w-full space-y-6">
-            <div class="text-xs sm:text-sm text-pink-400 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                <span>▲</span>
-                <span>在一起的时间计数</span>
-                <span>▲</span>
-            </div>
+<script>
+/* ===== Timer: counts from 1:44am, 22 June 2026 (viewer's local time) ===== */
+const START = new Date(2026, 5, 22, 1, 44, 0);
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
 
-            <!-- Big Number Timer Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                <!-- Days -->
-                <div class="bg-black/60 border-2 border-cyan-400 p-3">
-                    <div id="days" class="text-3xl sm:text-4xl font-bold text-cyan-300 pixel-font-en">000</div>
-                    <div class="text-xs text-slate-400 mt-1">DAYS</div>
-                </div>
-                <!-- Hours -->
-                <div class="bg-black/60 border-2 border-cyan-400 p-3">
-                    <div id="hours" class="text-3xl sm:text-4xl font-bold text-cyan-300 pixel-font-en">00</div>
-                    <div class="text-xs text-slate-400 mt-1">HOURS</div>
-                </div>
-                <!-- Minutes -->
-                <div class="bg-black/60 border-2 border-cyan-400 p-3">
-                    <div id="minutes" class="text-3xl sm:text-4xl font-bold text-cyan-300 pixel-font-en">00</div>
-                    <div class="text-xs text-slate-400 mt-1">MINS</div>
-                </div>
-                <!-- Seconds -->
-                <div class="bg-black/60 border-2 border-pink-500 p-3">
-                    <div id="seconds" class="text-3xl sm:text-4xl font-bold text-pink-400 pixel-font-en tick-second">00</div>
-                    <div class="text-xs text-pink-400 mt-1">SECS</div>
-                </div>
-            </div>
+function tick(){
+  const now = new Date();
+  if (now < START){
+    ['mo','dy','td','th'].forEach(i => $(i).textContent = '0');
+    ['hh','mm','ss'].forEach(i => $(i).textContent = '00');
+    return;
+  }
+  let months = (now.getFullYear() - START.getFullYear()) * 12 + (now.getMonth() - START.getMonth());
+  let anchor = new Date(START); anchor.setMonth(START.getMonth() + months);
+  if (anchor > now){ months--; anchor = new Date(START); anchor.setMonth(START.getMonth() + months); }
+  const rest = now - anchor, total = now - START;
+  $('mo').textContent = months;
+  $('dy').textContent = Math.floor(rest / 864e5);
+  $('hh').textContent = pad(Math.floor(rest / 36e5) % 24);
+  $('mm').textContent = pad(Math.floor(rest / 6e4) % 60);
+  $('ss').textContent = pad(Math.floor(rest / 1e3) % 60);
+  $('td').textContent = Math.floor(total / 864e5);
+  $('th').textContent = Math.floor(total / 36e5).toLocaleString();
+}
+tick(); setInterval(tick, 250);
 
-            <!-- Exact Timestamp -->
-            <div class="text-xs text-slate-400 font-mono pt-2 border-t border-slate-700">
-                计时起点：2024年06月22日 凌晨 01:44
-            </div>
-        </section>
+/* ===== Pixel sprite (original swordsman, water-breathing style) =====
+   To use your own 8-bit image instead, put its URL or data: URI below. */
+const CUSTOM_SPRITE = '';
 
-        <!-- 8-Bit Pixel Giyu Badge -->
-        <section class="pixel-box-pink p-4 w-full flex items-center justify-between text-left">
-            <div class="flex items-center gap-3">
-                <div class="text-3xl">⚔️</div>
-                <div>
-                    <div class="text-xs text-pink-300 font-bold">水柱 · 富冈义勇</div>
-                    <div class="text-sm font-bold text-yellow-300 mt-0.5">专属守护玩家：王依晴</div>
-                </div>
-            </div>
-            <button onclick="pressHeartButton()" class="pixel-btn text-xs px-3 py-2 cursor-pointer">
-                ❤️ PRESS
-            </button>
-        </section>
+const PAL = {H:'#1b2340',S:'#f3cfa6',E:'#2a6df4',M:'#b5533c',G:'#1c5a3c',W:'#f6efdc',R:'#d8402c',
+  Y:'#f0c35a',T:'#2ec4b6',B:'#1a1a2e',b:'#2c2f55',K:'#0a0a14',C:'#9ff1e6'};
+const TOP = [
+ ".....HHHHHH.....",
+ "....HHHHHHHH....",
+ "...HHHHHHHHHH...",
+ "...HHHSSSSHHH...",
+ "..HHSSESSESSHH..",
+ "..HHSSSMMSSSHH..",
+ "..HH.SSSSSS.HH..",
+ "..GGGGGWWYRYRY..",
+ ".GGGGGGWWRYRYRY.",
+ ".GGGGGGWWTWTWTW.",
+ ".GGGGGGWWRYRYRY.",
+ ".SGGGGGWWYRYRYS.",
+ "..BBBBBYYBBBBB..",
+ "..bbbbbbbbbbbb..",
+ "..bbbbbbbbbbbb.."];
+const LEGS = [
+ ["..bbbbb..bbbbb..","..bbbbb..bbbbb..","..WWWWW..WWWWW..","..KKKKK..KKKKK..","................"],
+ ["..bbbb....bbbb..",".bbbb......bbbb.",".WWWW......WWWW.",".KKKK......KKKK.","................"]];
+const SWORD = ["..W.",".CW.",".CW.",".CW.",".CW.",".CW.",".CW.",".CW.",".CW.",".CW.","YYYY",".RR.",".BB.",".RR.",".YY."];
 
-    </main>
+function paint(cv, rows, blink){
+  const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height);
+  rows.forEach((r, y) => [...r].forEach((k, x) => {
+    if (blink && k === 'E') k = 'S';
+    if (k !== '.'){ c.fillStyle = PAL[k]; c.fillRect(x, y, 1, 1); }
+  }));
+}
+let stride = 0, blink = false;
+const drawBody = () => paint($('body'), TOP.concat(LEGS[stride]), blink);
+drawBody(); paint($('sword'), SWORD);
+if (CUSTOM_SPRITE){
+  const im = new Image(); im.src = CUSTOM_SPRITE; im.className = 'custom'; im.alt = '';
+  $('bob').replaceChildren(im);
+}
+setInterval(() => { blink = true; drawBody(); setTimeout(() => { blink = false; drawBody(); }, 140); }, 3200);
 
-    <!-- Bottom Ribbon & Simple Footer -->
-    <footer class="relative z-10 py-4 text-center text-xs text-slate-500 space-y-2">
-        <p>GAME OVER? NEVER. 👾</p>
-        <div class="giyu-pixel-bar"></div>
-    </footer>
+/* ===== Walking ===== */
+const walker = $('walker'), flip = $('flip'), bubble = $('bubble');
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let x = 30, dir = 1, pause = 0, n = 0;
+function step(){
+  const maxX = Math.max(60, innerWidth - 150);
+  if (!still){
+    if (pause > 0){ pause--; if (stride){ stride = 0; drawBody(); } }
+    else {
+      x += dir * 1.5;
+      if (x >= maxX){ dir = -1; pause = 110; }
+      if (x <= 20){ dir = 1; pause = 110; }
+      if (++n % 10 === 0 && !CUSTOM_SPRITE){ stride ^= 1; drawBody(); }
+    }
+  }
+  walker.style.transform = `translateX(${Math.round(x)}px)`;
+  flip.style.transform = `scaleX(${dir})`;
+  requestAnimationFrame(step);
+}
+step();
 
-    <script>
-        // Exact Start Date: June 22, 2024 at 1:44 AM
-        const startDate = new Date('2024-06-22T01:44:00');
+function say(){
+  bubble.classList.add('on'); clearTimeout(say.t);
+  say.t = setTimeout(() => bubble.classList.remove('on'), 1800);
+}
+function hopUp(){
+  const h = $('hop'); h.classList.remove('jump'); void h.offsetWidth; h.classList.add('jump');
+}
+function swing(){
+  const s = $('sword'); s.classList.remove('swing'); void s.offsetWidth; s.classList.add('swing');
+}
+walker.addEventListener('pointerdown', e => { e.stopPropagation(); hopUp(); say(); });
 
-        function updateTimer() {
-            const now = new Date();
-            const diff = now - startDate;
+/* ===== Pixel canvases (1 canvas px = 4 screen px) ===== */
+const P = 4, bg = $('bg'), fr = $('front'), bx = bg.getContext('2d'), fx = fr.getContext('2d');
+let W, H, stars = [], bubbles = [], t = 0;
+const splash = [], slashes = [];
+function size(){
+  W = Math.ceil(innerWidth / P); H = Math.ceil(innerHeight / P);
+  bg.width = fr.width = W; bg.height = fr.height = H;
+  stars = Array.from({length: Math.round(W * H / 260)}, () => ({
+    x: Math.floor(Math.random() * W), y: Math.floor(Math.random() * H * .62), p: Math.random() * 3,
+    s: Math.random() < .2 ? 2 : 1, c: ['#ffffff','#bff3ea','#ffe9a8'][Math.floor(Math.random() * 3)]}));
+  bubbles = Array.from({length: 22}, () => newBubble(true));
+}
+function newBubble(init){
+  return {x: Math.floor(Math.random() * W), y: init ? Math.random() * H : H + 2, v: Math.random() * .25 + .1, s: Math.random() * 6};
+}
+addEventListener('resize', size); size();
 
-            if (diff < 0) return;
+function wave(c, y0, amp, wl, sp, col, crest){
+  for (let i = 0; i < W; i++){
+    const s = Math.sin(i / wl + t * sp), top = y0 + Math.round(s * amp);
+    c.fillStyle = col; c.fillRect(i, top, 1, H - top);
+    if (crest && s > .8){ c.fillStyle = '#8ff5e6'; c.fillRect(i, top, 1, 1); }
+  }
+}
+function moon(c, mx, my, r){
+  for (let dy = -r; dy <= r; dy++){
+    const h = Math.floor(Math.sqrt(r * r - dy * dy));
+    c.fillStyle = '#fdf6c8'; c.fillRect(mx - h, my + dy, h * 2 + 1, 1);
+  }
+  c.fillStyle = '#e4d894';
+  c.fillRect(mx - 3, my - 3, 3, 2); c.fillRect(mx + 2, my + 1, 3, 3); c.fillRect(mx - 4, my + 3, 2, 2);
+}
+function draw(){
+  t++;
+  bx.clearRect(0, 0, W, H);
+  for (const s of stars){
+    if ((Math.floor(t / 24 + s.p) % 3) !== 0){ bx.fillStyle = s.c; bx.fillRect(s.x, s.y, s.s, s.s); }
+  }
+  moon(bx, Math.round(W * .84), Math.round(H * .16) + 6, 8);
+  for (const b of bubbles){
+    b.y -= b.v; if (b.y < -2){ Object.assign(b, newBubble(false)); }
+    bx.fillStyle = '#bff3ea88'; bx.fillRect(Math.round(b.x + Math.sin(t / 30 + b.s) * 1.5), Math.round(b.y), 1, 1);
+  }
+  wave(bx, H - 20, 2, 5, .03, '#0f5f73', false);
+  wave(bx, H - 14, 2, 4, -.04, '#0a4256', false);
 
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((diff / (1000 * 60)) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
+  fx.clearRect(0, 0, W, H);
+  wave(fx, H - 9, 2, 3.5, .05, '#052436', true);
 
-            document.getElementById('days').innerText = String(days).padStart(3, '0');
-            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
-            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
-            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
-        }
+  for (let i = slashes.length - 1; i >= 0; i--){
+    const s = slashes[i]; s.t += .06;
+    if (s.t > 1.6){ slashes.splice(i, 1); continue; }
+    const reach = Math.min(1, s.t * 1.8) * W, alpha = Math.max(0, 1.6 - s.t);
+    for (let i2 = 0; i2 < reach; i2++){
+      const y = Math.round(s.y0 + (i2 / W) * (s.y1 - s.y0));
+      fx.globalAlpha = alpha; fx.fillStyle = '#ffffff'; fx.fillRect(i2, y, 1, 2);
+      fx.fillStyle = '#00f5d4'; fx.fillRect(i2, y + 2, 1, 1);
+    }
+    fx.globalAlpha = 1;
+  }
+  for (let i = splash.length - 1; i >= 0; i--){
+    const p = splash[i];
+    p.x += p.vx; p.y += p.vy; p.vy += .12; p.l -= .018;
+    if (p.l <= 0){ splash.splice(i, 1); continue; }
+    fx.globalAlpha = p.l; fx.fillStyle = p.c; fx.fillRect(Math.round(p.x), Math.round(p.y), p.z, p.z);
+  }
+  fx.globalAlpha = 1;
+  requestAnimationFrame(draw);
+}
+draw();
 
-        setInterval(updateTimer, 1000);
-        updateTimer();
+function burst(px, py){
+  const cols = ['#00f5d4','#ff85a1','#facc15','#ffffff'];
+  for (let i = 0; i < 40; i++){
+    const a = Math.random() * 6.283, v = Math.random() * 2.2 + .6;
+    splash.push({x: px / P, y: py / P, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1.2, l: 1, z: Math.random() < .3 ? 2 : 1, c: cols[i % 4]});
+  }
+}
+function slash(y){
+  const yy = y / P;
+  slashes.push({t: 0, y0: yy + 14, y1: yy - 14});
+}
 
-        // 8-Bit Retro Chiptune Beep
-        function playBeep(freq = 440) {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'square'; // 8-bit square wave
-                osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                gain.gain.setValueAtTime(0.05, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.1);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.1);
-            } catch(e){}
-        }
-
-        function pressHeartButton() {
-            playBeep(880);
-            confetti({
-                particleCount: 40,
-                spread: 60,
-                origin: { y: 0.8 },
-                colors: ['#00f5d4', '#ff85a1', '#facc15']
-            });
-        }
-
-        // 8-Bit Pixel Particle Canvas
-        const canvas = document.getElementById('pixelCanvas');
-        const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        const pixels = [];
-        const count = 30;
-
-        class PixelParticle {
-            constructor() {
-                this.reset();
-            }
-            reset() {
-                this.x = Math.floor(Math.random() * canvas.width);
-                this.y = canvas.height + Math.random() * 50;
-                this.size = Math.floor(Math.random() * 4 + 4); // Pixel squares
-                this.speedY = Math.random() * 1 + 0.5;
-                this.color = ['#00f5d4', '#ff85a1', '#facc15', '#3b82f6'][Math.floor(Math.random() * 4)];
-            }
-            update() {
-                this.y -= this.speedY;
-                if (this.y < -10) this.reset();
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(Math.floor(this.x), Math.floor(this.y), this.size, this.size);
-            }
-        }
-
-        for (let i = 0; i < count; i++) pixels.push(new PixelParticle());
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            pixels.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animate);
-        }
-        animate();
-    </script>
+$('btn').addEventListener('click', e => {
+  const r = e.currentTarget.getBoundingClientRect();
+  slash(r.top + r.height / 2); swing(); hopUp(); say();
+  setTimeout(() => burst(r.left + r.width / 2, r.top + r.height / 2), 260);
+});
+addEventListener('pointerdown', e => { if (!e.target.closest('#btn')) burst(e.clientX, e.clientY); });
+setTimeout(() => slash(innerHeight * .3), 500);
+</script>
 </body>
 </html>
