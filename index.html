@@ -1,0 +1,606 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我爱你 王依晴 — 执子之手，与子偕老</title>
+    <!-- STREAMING_CHUNK: Loading Tailwind CSS, FontAwesome and Google Calligraphy Fonts -->
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+    <script src="[https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js](https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js)"></script>
+    
+    <style>
+        @import url('[https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&family=Zhi+Mang+Xing&display=swap](https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&family=Zhi+Mang+Xing&display=swap)');
+
+        /* STREAMING_CHUNK: Styling core themes, Chinese fonts, and custom animations */
+        :root {
+            --vermilion: #8B0000;
+            --gold: #D4AF37;
+            --gold-light: #F3E5AB;
+            --ink: #1A181B;
+            --silk-bg: #2B070B;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background-color: var(--silk-bg);
+            color: var(--gold-light);
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .font-calligraphy {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+
+        .font-cursive {
+            font-family: 'Zhi Mang Xing', cursive;
+        }
+
+        /* Traditional Gold Metallic Text Effects */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFE259 0%, #FFA751 50%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .gold-border {
+            border: 2px solid var(--gold);
+            box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.2), 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Traditional Pattern Border Overlay */
+        .chinese-pattern-bg {
+            background-image: radial-gradient(#d4af37 0.75px, transparent 0.75px);
+            background-size: 24px 24px;
+            background-color: rgba(30, 4, 8, 0.92);
+        }
+
+        /* Canvas Particle Effects */
+        #blossomCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Lantern Animation */
+        .lantern-sway {
+            transform-origin: top center;
+            animation: sway 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes sway {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
+
+        /* Floating Wish Lantern Effect */
+        .floating-lantern {
+            position: absolute;
+            animation: floatUp 12s linear forwards;
+            cursor: pointer;
+            filter: drop-shadow(0 0 10px #FF8C00);
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.6) rotate(0deg);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(-20vh) scale(1) rotate(10deg);
+                opacity: 0;
+            }
+        }
+
+        /* Traditional Scroll Style */
+        .scroll-container {
+            background: #FAF0E6;
+            color: #2c0b0e;
+            border-top: 12px solid #8B0000;
+            border-bottom: 12px solid #8B0000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .scroll-container::before, .scroll-container::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 100%;
+            background: #D4AF37;
+            top: 0;
+        }
+        .scroll-container::before { left: -12px; border-radius: 4px 0 0 4px; }
+        .scroll-container::after { right: -12px; border-radius: 0 4px 4px 0; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--silk-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="chinese-pattern-bg min-h-screen flex flex-col justify-between relative selection:bg-red-900 selection:text-yellow-200">
+
+    <!-- STREAMING_CHUNK: Rendering canvas for falling petals & interactive particles -->
+    <canvas id="blossomCanvas"></canvas>
+
+    <!-- Navigation / Top Audio Bar -->
+    <header class="relative z-30 p-4 border-b border-yellow-600/30 bg-black/40 backdrop-blur-md flex justify-between items-center px-6">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full border-2 border-yellow-500 flex items-center justify-center bg-red-950">
+                <span class="font-calligraphy text-yellow-400 text-lg">晴</span>
+            </div>
+            <span class="font-calligraphy text-yellow-300 text-xl tracking-wider">相守 · 依晴</span>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button onclick="spawnWishLantern()" class="bg-gradient-to-r from-red-800 to-amber-700 hover:from-red-700 hover:to-amber-600 text-yellow-200 border border-yellow-500/50 text-xs sm:text-sm px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg transition-all active:scale-95">
+                <i class="fas fa-lantern text-amber-300 animate-bounce"></i> 放飞许愿灯
+            </button>
+            <button onclick="toggleAudio()" id="audioBtn" class="bg-black/60 hover:bg-black text-yellow-400 border border-yellow-600/40 text-xs sm:text-sm px-3 py-1.5 rounded-full flex items-center gap-2 transition-all">
+                <i class="fas fa-music text-yellow-500" id="audioIcon"></i>
+                <span id="audioText">背景音乐: 关</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- STREAMING_CHUNK: Main Container - Header Declaration and Lantern Decoration -->
+    <main class="relative z-20 max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-12 text-center">
+        
+        <!-- Top Hanging Decorative Lanterns -->
+        <div class="flex justify-between max-w-2xl mx-auto px-8 -mt-4 pointer-events-none">
+            <div class="lantern-sway flex flex-col items-center">
+                <div class="w-0.5 h-12 bg-yellow-600"></div>
+                <div class="w-12 h-16 bg-red-700 border-2 border-yellow-500 rounded-2xl flex items-center justify-center shadow-lg shadow-red-900/50">
+                    <span class="font-calligraphy text-yellow-300 text-xs">福</span>
+                </div>
+                <div class="w-0.5 h-6 bg-yellow-500"></div>
+            </div>
+            <div class="lantern-sway flex flex-col items-center" style="animation-delay: -2s;">
+                <div class="w-0.5 h-16 bg-yellow-600"></div>
+                <div class="w-14 h-20 bg-red-800 border-2 border-yellow-500 rounded-3xl flex items-center justify-center shadow-xl shadow-red-900/60">
+                    <span class="font-calligraphy text-yellow-300 text-sm">囍</span>
+                </div>
+                <div class="w-0.5 h-8 bg-yellow-500"></div>
+            </div>
+            <div class="lantern-sway flex flex-col items-center">
+                <div class="w-0.5 h-12 bg-yellow-600"></div>
+                <div class="w-12 h-16 bg-red-700 border-2 border-yellow-500 rounded-2xl flex items-center justify-center shadow-lg shadow-red-900/50">
+                    <span class="font-calligraphy text-yellow-300 text-xs">爱</span>
+                </div>
+                <div class="w-0.5 h-6 bg-yellow-500"></div>
+            </div>
+        </div>
+
+        <!-- STREAMING_CHUNK: Central Main Love Declaration -->
+        <section class="space-y-4 pt-2">
+            <div class="inline-block border-y-2 border-yellow-600/60 py-2 px-8 bg-red-950/40 backdrop-blur-sm">
+                <p class="text-xs sm:text-sm text-yellow-400 tracking-[0.3em] font-medium uppercase">
+                    三生有幸 · 始于二零二四年六月二十二日 凌晨01:44
+                </p>
+            </div>
+
+            <!-- Calligraphy Declaration Name -->
+            <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black font-calligraphy gold-gradient-text tracking-wide py-2 leading-tight">
+                我爱你 王依晴
+            </h1>
+
+            <p class="font-cursive text-2xl sm:text-3xl text-yellow-200/90 tracking-widest max-w-2xl mx-auto">
+                “浮世三千，吾爱有三，日、月与卿。朝为日，暮为月，卿为朝朝暮暮。”
+            </p>
+        </section>
+
+        <!-- STREAMING_CHUNK: Real-Time Love Timer Box -->
+        <section class="gold-border bg-gradient-to-b from-red-950/80 to-black/90 p-6 sm:p-10 rounded-3xl shadow-2xl relative overflow-hidden backdrop-blur-md">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-yellow-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-red-600/10 rounded-full blur-3xl"></div>
+
+            <h2 class="text-lg sm:text-xl font-bold text-yellow-400 tracking-widest uppercase mb-6 flex items-center justify-center gap-3">
+                <span class="h-0.5 w-12 bg-yellow-600"></span>
+                <span>我们相爱已有</span>
+                <span class="h-0.5 w-12 bg-yellow-600"></span>
+            </h2>
+
+            <!-- Timer Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                <div class="bg-black/60 border border-yellow-600/40 p-4 rounded-2xl flex flex-col items-center justify-center transform hover:scale-105 transition-transform">
+                    <span id="days" class="text-4xl sm:text-6xl font-black text-yellow-300 font-mono">000</span>
+                    <span class="text-xs sm:text-sm text-yellow-500 font-bold mt-2">天 (Days)</span>
+                </div>
+                <div class="bg-black/60 border border-yellow-600/40 p-4 rounded-2xl flex flex-col items-center justify-center transform hover:scale-105 transition-transform">
+                    <span id="hours" class="text-4xl sm:text-6xl font-black text-yellow-300 font-mono">00</span>
+                    <span class="text-xs sm:text-sm text-yellow-500 font-bold mt-2">时 (Hours)</span>
+                </div>
+                <div class="bg-black/60 border border-yellow-600/40 p-4 rounded-2xl flex flex-col items-center justify-center transform hover:scale-105 transition-transform">
+                    <span id="minutes" class="text-4xl sm:text-6xl font-black text-yellow-300 font-mono">00</span>
+                    <span class="text-xs sm:text-sm text-yellow-500 font-bold mt-2">分 (Minutes)</span>
+                </div>
+                <div class="bg-black/60 border border-yellow-600/40 p-4 rounded-2xl flex flex-col items-center justify-center transform hover:scale-105 transition-transform">
+                    <span id="seconds" class="text-4xl sm:text-6xl font-black text-red-400 font-mono">00</span>
+                    <span class="text-xs sm:text-sm text-yellow-500 font-bold mt-2">秒 (Seconds)</span>
+                </div>
+            </div>
+
+            <!-- Exact Timestamp Footer -->
+            <p class="text-xs text-yellow-500/80 mt-6 font-mono tracking-wider">
+                起始时刻: 2024年06月22日 01:44:00 (Local Time)
+            </p>
+        </section>
+
+        <!-- STREAMING_CHUNK: Traditional Silk Scroll - Love Letter Carousel -->
+        <section class="max-w-3xl mx-auto py-6">
+            <div class="text-center mb-6">
+                <span class="font-calligraphy text-2xl text-yellow-400 tracking-wider">📜 锦书寄情</span>
+                <p class="text-xs text-yellow-600/80">点击下方滑动阅读我写给依晴的情书</p>
+            </div>
+
+            <div class="scroll-container rounded-lg p-6 sm:p-10 relative text-left">
+                <!-- Red Stamp Icon -->
+                <div class="absolute top-4 right-6 w-12 h-12 border-2 border-red-700 text-red-800 rounded flex items-center justify-center font-calligraphy text-sm font-bold rotate-12 opacity-80 pointer-events-none">
+                    依晴<br>亲启
+                </div>
+
+                <div id="scrollContent" class="space-y-4 text-base sm:text-lg leading-relaxed font-serif text-amber-950 transition-opacity duration-300">
+                    <!-- Dynamic Letter Content -->
+                </div>
+
+                <!-- Carousel Controls -->
+                <div class="flex justify-between items-center mt-8 pt-4 border-t border-amber-900/20">
+                    <button onclick="prevLetter()" class="text-xs sm:text-sm bg-red-900 text-yellow-200 px-4 py-2 rounded border border-yellow-600 hover:bg-red-800 transition-colors">
+                        ← 上一篇
+                    </button>
+                    <span id="letterCounter" class="text-xs font-bold text-amber-900">1 / 4</span>
+                    <button onclick="nextLetter()" class="text-xs sm:text-sm bg-red-900 text-yellow-200 px-4 py-2 rounded border border-yellow-600 hover:bg-red-800 transition-colors">
+                        下一篇 →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STREAMING_CHUNK: Interactive Love Coupons (爱情兑换券) -->
+        <section class="space-y-6 pt-4">
+            <div class="text-center">
+                <span class="font-calligraphy text-3xl text-yellow-400">❤️ 王依晴专属 · 爱情兑换券</span>
+                <p class="text-xs text-yellow-600/80 mt-1">点击任意兑换券，即可在现实中随时向我兑换效力！</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+                <!-- Coupon 1 -->
+                <div onclick="claimCoupon('全身舒缓按摩一次 💆‍♀️')" class="gold-border bg-gradient-to-br from-red-900 to-black p-5 rounded-2xl cursor-pointer transform hover:-translate-y-1 transition-all group relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <span class="text-2xl">💆‍♀️</span>
+                        <span class="text-[10px] bg-yellow-500 text-black font-bold px-2 py-0.5 rounded">无限期有效</span>
+                    </div>
+                    <h3 class="font-black text-xl text-yellow-300 mt-3 group-hover:text-yellow-100">专属按摩券</h3>
+                    <p class="text-xs text-yellow-200/70 mt-1">随时召唤男朋友提供30分钟肩颈按摩服务，不得拒绝。</p>
+                    <div class="mt-4 text-right text-xs font-bold text-yellow-400 group-hover:underline">点击兑换 →</div>
+                </div>
+
+                <!-- Coupon 2 -->
+                <div onclick="claimCoupon('无条件原谅卡一次 🥺')" class="gold-border bg-gradient-to-br from-red-900 to-black p-5 rounded-2xl cursor-pointer transform hover:-translate-y-1 transition-all group relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <span class="text-2xl">🥺</span>
+                        <span class="text-[10px] bg-yellow-500 text-black font-bold px-2 py-0.5 rounded">免死金牌</span>
+                    </div>
+                    <h3 class="font-black text-xl text-yellow-300 mt-3 group-hover:text-yellow-100">无条件原谅卡</h3>
+                    <p class="text-xs text-yellow-200/70 mt-1">无论发生什么小脾气，出示此券立马无条件抱抱道歉。</p>
+                    <div class="mt-4 text-right text-xs font-bold text-yellow-400 group-hover:underline">点击兑换 →</div>
+                </div>
+
+                <!-- Coupon 3 -->
+                <div onclick="claimCoupon('深夜美食/奶茶派送一次 🧋')" class="gold-border bg-gradient-to-br from-red-900 to-black p-5 rounded-2xl cursor-pointer transform hover:-translate-y-1 transition-all group relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <span class="text-2xl">🧋</span>
+                        <span class="text-[10px] bg-yellow-500 text-black font-bold px-2 py-0.5 rounded">深夜特权</span>
+                    </div>
+                    <h3 class="font-black text-xl text-yellow-300 mt-3 group-hover:text-yellow-100">深夜奶茶/宵夜券</h3>
+                    <p class="text-xs text-yellow-200/70 mt-1">无论多晚想吃宵夜或喝奶茶，男朋友负责跑腿买单。</p>
+                    <div class="mt-4 text-right text-xs font-bold text-yellow-400 group-hover:underline">点击兑换 →</div>
+                </div>
+
+                <!-- Coupon 4 -->
+                <div onclick="claimCoupon('清空购物车/心愿礼物一份 🎁')" class="gold-border bg-gradient-to-br from-red-900 to-black p-5 rounded-2xl cursor-pointer transform hover:-translate-y-1 transition-all group relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <span class="text-2xl">🎁</span>
+                        <span class="text-[10px] bg-yellow-500 text-black font-bold px-2 py-0.5 rounded">惊喜心愿</span>
+                    </div>
+                    <h3 class="font-black text-xl text-yellow-300 mt-3 group-hover:text-yellow-100">心愿礼物券</h3>
+                    <p class="text-xs text-yellow-200/70 mt-1">可以指定一件藏在心里很久的想要的小礼物。</p>
+                    <div class="mt-4 text-right text-xs font-bold text-yellow-400 group-hover:underline">点击兑换 →</div>
+                </div>
+
+                <!-- Coupon 5 -->
+                <div onclick="claimCoupon('说走就走的双人旅行 ✈️')" class="gold-border bg-gradient-to-br from-red-900 to-black p-5 rounded-2xl cursor-pointer transform hover:-translate-y-1 transition-all group relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <span class="text-2xl">✈️</span>
+                        <span class="text-[10px] bg-yellow-500 text-black font-bold px-2 py-0.5 rounded">浪漫出行</span>
+                    </div>
+                    <h3 class="font-black text-xl text-yellow-300 mt-3 group-hover:text-yellow-100">双人旅行券</h3>
+                    <p class="text-xs text-yellow-200/70 mt-1">陪依晴去想去的任何城市看风景、吃美食。</p>
+                    <div class="mt-4 text-right text-xs font-bold text-yellow-400 group-hover:underline">点击兑换 →</div>
+                </div>
+
+                <!-- Coupon 6 -->
+                <div onclick="claimCoupon('超级无敌温暖大拥抱 🫂')" class="gold-border bg-gradient-to-br from-red-900 to-black p-5 rounded-2xl cursor-pointer transform hover:-translate-y-1 transition-all group relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <span class="text-2xl">🫂</span>
+                        <span class="text-[10px] bg-yellow-500 text-black font-bold px-2 py-0.5 rounded">无限次使用</span>
+                    </div>
+                    <h3 class="font-black text-xl text-yellow-300 mt-3 group-hover:text-yellow-100">无限次拥抱券</h3>
+                    <p class="text-xs text-yellow-200/70 mt-1">任何时候只要需要，立刻提供最温暖、最长情的拥抱。</p>
+                    <div class="mt-4 text-right text-xs font-bold text-yellow-400 group-hover:underline">点击兑换 →</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Seal -->
+    <footer class="relative z-20 py-8 border-t border-yellow-600/30 text-center space-y-2 bg-black/60">
+        <p class="font-calligraphy text-xl text-yellow-400">山无棱，天地合，乃敢与君绝。</p>
+        <p class="text-xs text-yellow-600">专属于 王依晴 的独家浪漫页面 | 制作于 2026</p>
+    </footer>
+
+    <!-- Coupon Claim Modal -->
+    <div id="couponModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="gold-border bg-red-950 p-6 sm:p-8 rounded-3xl max-w-sm w-full text-center space-y-4 relative shadow-2xl">
+            <div class="w-16 h-16 bg-yellow-500 rounded-full border-2 border-black mx-auto flex items-center justify-center text-3xl text-red-950 animate-bounce">
+                🧧
+            </div>
+            <h3 class="text-2xl font-black font-calligraphy text-yellow-300">兑换成功！</h3>
+            <p id="modalCouponText" class="text-sm font-bold text-yellow-100 bg-black/40 p-3 rounded-xl border border-yellow-600/30"></p>
+            <p class="text-xs text-yellow-400/80">截图发送给男朋友，即可要求立刻履行兑换承诺哦！</p>
+            <button onclick="closeModal()" class="w-full bg-yellow-500 text-red-950 font-black py-2.5 rounded-xl hover:bg-yellow-400 transition-colors">
+                我知道啦 (收下)
+            </button>
+        </div>
+    </div>
+
+    <!-- Container for Spawning Floating Lantern Wishes -->
+    <div id="lanternContainer" class="fixed inset-0 pointer-events-none z-30 overflow-hidden"></div>
+
+    <script>
+        /* STREAMING_CHUNK: JavaScript Logic - Timer, Canvas Petals, Audio Synthesizer, Coupon System */
+        
+        // Target Love Start Date: June 22, 2024 at 01:44:00 AM
+        const startDate = new Date('2024-06-22T01:44:00');
+
+        function updateLoveTimer() {
+            const now = new Date();
+            const diff = now - startDate;
+
+            if (diff < 0) return;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('days').innerText = String(days).padStart(3, '0');
+            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateLoveTimer, 1000);
+        updateLoveTimer();
+
+        // Letters Data for Scroll Carousel
+        const letters = [
+            `致 依晴：<br><br>自二零二四年六月二十二日凌晨1点44分起，我的世界因为有你而变得格外温暖。每一天与你相处的时光，都像是被岁月温柔相待的诗篇。<br><br>愿往后余生，冷暖有相伴，岁岁常相见。`,
+            `致 依晴：<br><br>“晓看天色暮看云，行也思君，坐也思君。”<br><br>无论是在热闹的街头，还是安安静静的深夜，我的心里总会有一个最柔软的位置留给你。谢谢你来到我的世界里，成为我最珍贵的偏爱。`,
+            `致 依晴：<br><br>喜欢你笑起来时弯弯的眼睛，喜欢你说话时温温柔柔的声音。与你在一起的每一个瞬间，都构成了我记忆里最美好的风景。<br><br>希望未来的每一个春夏秋冬，我们都能携手同行。`,
+            `致 依晴：<br><br>“执子之手，与子偕老。” 这不仅是一句古老的誓言，更是我想陪伴你走过漫长岁月的真挚初心。<br><br>我爱你，王依晴，无条件，无期限。`
+        ];
+
+        let currentLetterIdx = 0;
+
+        function renderLetter() {
+            const container = document.getElementById('scrollContent');
+            const counter = document.getElementById('letterCounter');
+            container.style.opacity = '0';
+            
+            setTimeout(() => {
+                container.innerHTML = letters[currentLetterIdx];
+                counter.innerText = `${currentLetterIdx + 1} / ${letters.length}`;
+                container.style.opacity = '1';
+            }, 200);
+        }
+
+        function prevLetter() {
+            currentLetterIdx = (currentLetterIdx - 1 + letters.length) % letters.length;
+            renderLetter();
+            playSoftBeep(400);
+        }
+
+        function nextLetter() {
+            currentLetterIdx = (currentLetterIdx + 1) % letters.length;
+            renderLetter();
+            playSoftBeep(500);
+        }
+
+        renderLetter();
+
+        // Floating Wishing Lantern System
+        const wishMessages = [
+            "愿依晴天天开心！",
+            "王依晴要照顾好自己~",
+            "执子之手，与子偕老",
+            "依晴永远美丽可爱！",
+            "平安喜乐，万事胜意",
+            "我爱你，王依晴！"
+        ];
+
+        function spawnWishLantern() {
+            const container = document.getElementById('lanternContainer');
+            const lantern = document.createElement('div');
+            lantern.className = 'floating-lantern pointer-events-auto flex flex-col items-center';
+            
+            const randomMsg = wishMessages[Math.floor(Math.random() * wishMessages.length)];
+            const randomLeft = Math.random() * 80 + 10; // 10% to 90%
+            
+            lantern.style.left = `${randomLeft}%`;
+            lantern.style.animationDuration = `${8 + Math.random() * 6}s`;
+
+            lantern.innerHTML = `
+                <div class="bg-gradient-to-b from-amber-400 to-red-600 border-2 border-yellow-300 text-red-950 font-bold text-xs px-3 py-2 rounded-xl shadow-lg border text-center max-w-[120px]">
+                    <i class="fas fa-heart text-red-700 block mb-1"></i>
+                    ${randomMsg}
+                </div>
+                <div class="w-1 h-3 bg-yellow-500"></div>
+                <div class="w-2 h-2 bg-yellow-300 rounded-full animate-ping"></div>
+            `;
+
+            lantern.onclick = () => {
+                confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 } });
+                playSoftBeep(880);
+                lantern.remove();
+            };
+
+            container.appendChild(lantern);
+            setTimeout(() => lantern.remove(), 14000);
+        }
+
+        // Spawn initial floating lanterns periodically
+        setInterval(spawnWishLantern, 4000);
+
+        // Coupon Claim Logic
+        function claimCoupon(title) {
+            document.getElementById('modalCouponText').innerText = `已为您兑换卡券: ${title}`;
+            document.getElementById('couponModal').classList.remove('hidden');
+            confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+            playSoftBeep(600);
+        }
+
+        function closeModal() {
+            document.getElementById('couponModal').classList.add('hidden');
+        }
+
+        // Web Audio Synthesizer (Traditional Pentatonic Ambient Flute / Chime)
+        let isAudioPlaying = false;
+        let audioInterval = null;
+
+        function playSoftBeep(freq = 440) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.8);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.8);
+            } catch(e){}
+        }
+
+        function toggleAudio() {
+            isAudioPlaying = !isAudioPlaying;
+            const btnText = document.getElementById('audioText');
+            const btnIcon = document.getElementById('audioIcon');
+
+            if (isAudioPlaying) {
+                btnText.innerText = "背景音乐: 开";
+                btnIcon.className = "fas fa-volume-up text-green-400 animate-pulse";
+                startAmbientMelody();
+            } else {
+                btnText.innerText = "背景音乐: 关";
+                btnIcon.className = "fas fa-music text-yellow-500";
+                if (audioInterval) clearInterval(audioInterval);
+            }
+        }
+
+        function startAmbientMelody() {
+            // Traditional Chinese Pentatonic Scale (Gong, Shang, Jiao, Zhi, Yu)
+            const pentatonicScale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+            audioInterval = setInterval(() => {
+                if (!isAudioPlaying) return;
+                const note = pentatonicScale[Math.floor(Math.random() * pentatonicScale.length)];
+                playSoftBeep(note);
+            }, 1200);
+        }
+
+        // Canvas Cherry Blossom (桃花) Particle System
+        const canvas = document.getElementById('blossomCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const petals = [];
+        const numPetals = 35;
+
+        class Petal {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * -canvas.height;
+                this.size = Math.random() * 8 + 6;
+                this.speedY = Math.random() * 1.2 + 0.8;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.opacity = Math.random() * 0.7 + 0.3;
+                this.rotation = Math.random() * 360;
+                this.spin = Math.random() * 2 - 1;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += Math.sin(this.y * 0.01) + this.speedX;
+                this.rotation += this.spin;
+
+                if (this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate((this.rotation * Math.PI) / 180);
+                ctx.fillStyle = `rgba(255, 182, 193, ${this.opacity})`;
+                ctx.beginPath();
+                // Draw Petal Shape
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-this.size, -this.size, -this.size * 1.5, this.size / 2, 0, this.size * 1.5);
+                ctx.bezierCurveTo(this.size * 1.5, this.size / 2, this.size, -this.size, 0, 0);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < numPetals; i++) {
+            petals.push(new Petal());
+        }
+
+        function animatePetals() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            petals.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animatePetals);
+        }
+
+        animatePetals();
+    </script>
+</body>
+</html>
