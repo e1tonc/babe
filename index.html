@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>王依晴 8-BIT</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🌊%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+SC:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -14,14 +15,14 @@
 html{height:100%}
 body{
   margin:0;min-height:100%;color:var(--ink);overflow-x:hidden;user-select:none;-webkit-user-select:none;
-  font-family:'DotGothic16','Noto Sans SC',monospace;
+  font-family:'DotGothic16','Noto Sans SC','PingFang SC','Microsoft YaHei',monospace;
   background:linear-gradient(var(--night),var(--sea) 60%,#0d2a4a);background-attachment:fixed;
   padding-top:env(safe-area-inset-top,0px);
 }
 canvas.layer{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none}
 #bg{z-index:0}
 #front{z-index:4}
-.en{font-family:'Press Start 2P',monospace}
+.en{font-family:'Press Start 2P','Courier New',monospace;font-weight:700}
 
 /* Top ribbon: left half plain, right half patterned (haori style) */
 .ribbon{position:fixed;top:0;left:0;right:0;height:12px;z-index:6;display:flex;border-bottom:3px solid #000}
@@ -127,29 +128,47 @@ main{position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:c
 <canvas class="layer" id="front"></canvas>
 
 <script>
-/* ===== Timer: counts from 1:44am, 22 June 2026 (viewer's local time) ===== */
-const START = new Date(2026, 5, 22, 1, 44, 0);
+/* ===== Timer =====
+   Counts from 1:44am, 22 June 2026 in the time zone below, so every device
+   shows the same numbers. If that moment was in another zone, change TZ
+   (for example 'Asia/Kuala_Lumpur'). */
+const TZ = 'Australia/Melbourne';
+const START_WALL = Date.UTC(2026, 5, 22, 1, 44, 0); // wall-clock time in TZ
+const zoneFmt = new Intl.DateTimeFormat('en-GB', {
+  timeZone: TZ, hourCycle: 'h23',
+  year: 'numeric', month: 'numeric', day: 'numeric',
+  hour: 'numeric', minute: 'numeric', second: 'numeric'
+});
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, '0');
 
+function wallNow(){
+  const p = {};
+  for (const part of zoneFmt.formatToParts(new Date())) p[part.type] = +part.value;
+  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+}
+function compute(now){
+  if (now < START_WALL) return {mo: 0, dy: 0, h: 0, m: 0, s: 0, td: 0, th: 0};
+  const s = new Date(START_WALL), n = new Date(now);
+  const at = k => { const d = new Date(START_WALL); d.setUTCMonth(s.getUTCMonth() + k); return d.getTime(); };
+  let mo = (n.getUTCFullYear() - s.getUTCFullYear()) * 12 + n.getUTCMonth() - s.getUTCMonth();
+  if (at(mo) > now) mo--;
+  const rest = now - at(mo), total = now - START_WALL;
+  return {
+    mo: mo, dy: Math.floor(rest / 864e5), h: Math.floor(rest / 36e5) % 24,
+    m: Math.floor(rest / 6e4) % 60, s: Math.floor(rest / 1e3) % 60,
+    td: Math.floor(total / 864e5), th: Math.floor(total / 36e5)
+  };
+}
 function tick(){
-  const now = new Date();
-  if (now < START){
-    ['mo','dy','td','th'].forEach(i => $(i).textContent = '0');
-    ['hh','mm','ss'].forEach(i => $(i).textContent = '00');
-    return;
-  }
-  let months = (now.getFullYear() - START.getFullYear()) * 12 + (now.getMonth() - START.getMonth());
-  let anchor = new Date(START); anchor.setMonth(START.getMonth() + months);
-  if (anchor > now){ months--; anchor = new Date(START); anchor.setMonth(START.getMonth() + months); }
-  const rest = now - anchor, total = now - START;
-  $('mo').textContent = months;
-  $('dy').textContent = Math.floor(rest / 864e5);
-  $('hh').textContent = pad(Math.floor(rest / 36e5) % 24);
-  $('mm').textContent = pad(Math.floor(rest / 6e4) % 60);
-  $('ss').textContent = pad(Math.floor(rest / 1e3) % 60);
-  $('td').textContent = Math.floor(total / 864e5);
-  $('th').textContent = Math.floor(total / 36e5).toLocaleString();
+  const r = compute(wallNow());
+  $('mo').textContent = r.mo;
+  $('dy').textContent = r.dy;
+  $('hh').textContent = pad(r.h);
+  $('mm').textContent = pad(r.m);
+  $('ss').textContent = pad(r.s);
+  $('td').textContent = r.td;
+  $('th').textContent = r.th.toLocaleString();
 }
 tick(); setInterval(tick, 250);
 
